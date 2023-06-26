@@ -5,8 +5,8 @@
       <h3>CREATE A TODO</h3>
       <form id="new-todo-form" @submit.prevent="addTodo">
         <h4>What's on your todo list?</h4>
-        <input type="text" name="content" id="content" placeholder="e.g. make a video" v-model="input_content" />
-        <!-- <Editor api-key=""></Editor> -->
+        <!-- <input type="text" name="content" id="content" placeholder="e.g. make a video" v-model="input_content" /> -->
+        <tinymce-editor  v-model="input_content"></tinymce-editor>
         <!--Add date picker in here-->
         <VueDatePicker v-model="input_date" placeholder="Select Date" model-type="yyyy-MM-dd" range
           :enable-time-picker="false" />
@@ -23,7 +23,8 @@
             <input type="checkbox" v-model="todo.done" />
           </label>
           <div class="todo-content">
-            <input type="text" v-model="todo.content" />
+            <span v-html="todo.content"></span>
+            <!-- <input type="text" v-model="todo.content" /> -->
             <span>{{ todo.date[0] }} - {{ todo.date[1] }}</span>
           </div>
           <div class="actions">
@@ -42,8 +43,7 @@ import { ref, onMounted, computed, watch } from 'vue'
 import VueDatePicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css'
 import { useToast } from "vue-toastification";
-import Editor from '@tinymce/tinymce-vue';
-
+import TinymceEditor from './components/tinymce.vue';
 const todos = ref([])
 const name = ref('')
 const today = new Date();

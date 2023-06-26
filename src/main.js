@@ -1,21 +1,8 @@
-// The Vue build version to load with the `import` command
-// (runtime-only or standalone) has been set in webpack.base.conf with an alias.
-import Vue from 'vue'
-import App from './App'
-import Vuex from 'vuex'
-import 'bootstrap/dist/css/bootstrap.css'
-import 'bootstrap-vue/dist/bootstrap-vue.css'
-
-Vue.use(Vuex)
-
-Vue.config.productionTip = false
-
-Vue.use(BootstrapVue)
-Vue.use(IconsPlugin)
-/* eslint-disable no-new */
-
-new Vue({
-  el: '#app',
-  components: { App },
-  template: '<App/>'
-})
+import { createApp } from 'vue'
+import App from './App.vue'
+import './main.css'
+import Toast from 'vue-toastification'
+import 'vue-toastification/dist/index.css'
+const app = createApp(App)
+app.use(Toast)
+app.mount('#app')

@@ -1,86 +1,104 @@
-<script setup>
-import { RouterLink, RouterView } from 'vue-router'
-import HelloWorld from './components/HelloWorld.vue'
-</script>
 
 <template>
-  <header>
-    <!-- <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
+  <main class="app">
+    <section class="create-todo">
+      <h3>CREATE A TODO</h3>
+      <form id="new-todo-form" @submit.prevent="addTodo">
+        <h4>What's on your todo list?</h4>
+        <input type="text" name="content" id="content" placeholder="e.g. make a video" v-model="input_content" />
+        <!-- <Editor api-key=""></Editor> -->
+        <!--Add date picker in here-->
+        <VueDatePicker v-model="input_date" placeholder="Select Date" model-type="yyyy-MM-dd" range
+          :enable-time-picker="false" />
+        <input type="submit" value="Add todo" />
+      </form>
+    </section>
 
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
+    <section class="todo-list">
+      <h3>TODO LIST</h3>
+      <div class="list" id="todo-list">
 
-      <nav>
-        <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/about">About</RouterLink>
-      </nav>
-    </div> -->
-    Something
-  </header>
+        <div v-for="todo in todos_asc" :class="`todo-item ${todo.done && 'done'}`">
+          <label>
+            <input type="checkbox" v-model="todo.done" />
+          </label>
+          <div class="todo-content">
+            <input type="text" v-model="todo.content" />
+            <span>{{ todo.date[0] }} - {{ todo.date[1] }}</span>
+          </div>
+          <div class="actions">
+            <button class="delete" @click="removeTodo(todo)">Delete</button>
+          </div>
+        </div>
 
-  <!-- <RouterView /> -->
+      </div>
+    </section>
+
+  </main>
 </template>
 
-<style scoped>
-header {
-  line-height: 1.5;
-  max-height: 100vh;
-}
+<script setup>
+import { ref, onMounted, computed, watch } from 'vue'
+import VueDatePicker from '@vuepic/vue-datepicker';
+import '@vuepic/vue-datepicker/dist/main.css'
+import { useToast } from "vue-toastification";
+import Editor from '@tinymce/tinymce-vue';
 
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
-}
+const todos = ref([])
+const name = ref('')
+const today = new Date();
+const input_content = ref('')
+const input_date = ref(null);
+const toast = useToast()
 
-nav {
-  width: 100%;
-  font-size: 12px;
-  text-align: center;
-  margin-top: 2rem;
-}
 
-nav a.router-link-exact-active {
-  color: var(--color-text);
-}
+const todos_asc = computed(() => todos.value.sort((a, b) => {
+  return a.createdAt - b.createdAt
+}))
 
-nav a.router-link-exact-active:hover {
-  background-color: transparent;
-}
+watch(name, (newVal) => {
+  localStorage.setItem('name', newVal)
+})
 
-nav a {
-  display: inline-block;
-  padding: 0 1rem;
-  border-left: 1px solid var(--color-border);
-}
+watch(todos, (newVal) => {
+  localStorage.setItem('todos', JSON.stringify(newVal))
+}, {
+  deep: true
+})
 
-nav a:first-of-type {
-  border: 0;
-}
+watch(todos, () => {
+  todos?.value.forEach(todo => {
+    let dl = new Date(todo.date[1])
+    if(dl.getDate() == today.getDate() && dl.getMonth() == today.getMonth() && dl.getFullYear() == dl.getFullYear()) {
+      toast.warning(`${todo.content} is not finished`)
+    }
+  });
+})
 
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
+const addTodo = () => {
+  if (input_content.value.trim() === '' || input_date.value === null) {
+    return
   }
 
-  .logo {
-    margin: 0 2rem 0 0;
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
-
-  nav {
-    text-align: left;
-    margin-left: -1rem;
-    font-size: 1rem;
-
-    padding: 1rem 0;
-    margin-top: 1rem;
-  }
+  todos.value.push({
+    content: input_content.value,
+    // category: input_category.value,
+    date: input_date.value,
+    done: false,
+    editable: false,
+    createdAt: new Date().getTime()
+  })
 }
-</style>
+
+const removeTodo = (todo) => {
+  todos.value = todos.value.filter((t) => t !== todo)
+}
+
+onMounted(() => {
+  name.value = localStorage.getItem('name') || ''
+  todos.value = JSON.parse(localStorage.getItem('todos')) || []
+})
+
+
+
+</script>

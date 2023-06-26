@@ -202,12 +202,14 @@ input:checked ~ .bubble::after {
 	background-color: var(--danger);
 }
 
-.todo-item.done .todo-content input {
-	text-decoration: line-through;
+.todo-item.done .todo-content span p {
+	text-decoration: line-through black 2px;
 	color: var(--grey);
+
 }
 
 .dp__main {
     border: solid 1px black;
     margin-bottom: 10px;
+	margin-top: 10px;
 }
